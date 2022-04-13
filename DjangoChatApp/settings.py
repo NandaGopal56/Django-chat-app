@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'channels',
-    'core'
+    'core',
+    'room'
 ]
 
 MIDDLEWARE = [
@@ -73,6 +74,11 @@ TEMPLATES = [
 WSGI_APPLICATION = 'DjangoChatApp.wsgi.application'
 ASGI_APPLICATION = 'DjangoChatApp.asgi.application'
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -126,6 +132,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGOUT_REDIRECT_URL = '/'
-LOGIN_REDIRECT_URL = '/rooms'
-LOGIN_URL = '/login'
+# LOGOUT_REDIRECT_URL = '/'
+# LOGIN_REDIRECT_URL = '/rooms'
+# LOGIN_URL = '/login'

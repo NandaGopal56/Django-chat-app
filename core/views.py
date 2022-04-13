@@ -1,8 +1,7 @@
-import imp
 from django.shortcuts import render, redirect
 from .forms import SignUpForm
 from django.contrib.auth import login
-
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 
@@ -20,3 +19,4 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'core/signup.html', {'form': form})
+
