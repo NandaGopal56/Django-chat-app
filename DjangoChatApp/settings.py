@@ -40,7 +40,8 @@ INSTALLED_APPS = [
 
     'channels',
     'core',
-    'room'
+    'room',
+    'userchat',
 ]
 
 MIDDLEWARE = [
