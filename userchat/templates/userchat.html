@@ -32,22 +32,25 @@
 
 
 {% block scripts %}
-{{ room.slug|json_script:"json-roomname" }}
 
 {{ request.user.username| json_script:"json-username"}}
 
 <script>
-    const roomName = JSON.parse(document.getElementById('json-roomname').textContent);
     const userName = JSON.parse(document.getElementById('json-username').textContent);
+    const roomName = userName
 
-    let target
-    if (userName == 'testUser1'){
-        target = 'admin'
+    let sent_by_user
+    let sent_to_user
+    
+    if (userName == 'admin'){
+        sent_by_user = 1
+        sent_to_user = 2
     } else {
-        target = 'testUser1'
+        sent_by_user = 2
+        sent_to_user = 1
     }
     
-    const chatSocket = new WebSocket(`ws://${window.location.host}/uws/${target}/`);
+    const chatSocket = new WebSocket(`ws://${window.location.host}/uws/${roomName}/`);
 
     chatSocket.onmessage = function(e) {
         console.log('onmessage')
@@ -76,7 +79,9 @@
 
         chatSocket.send(JSON.stringify({
             'message': message,
-            'username': userName
+            'username': userName,
+            'sent_by_user': sent_by_user,
+            'sent_to_user': sent_to_user
         }))
 
         messageInputDom.value = '';
