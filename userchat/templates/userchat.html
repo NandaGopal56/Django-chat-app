@@ -1,20 +1,15 @@
-{% extends 'core/base.html' %}
+{% extends './base.html' %}
 
 {% block title %} {{room.name}} | {% endblock %}
 
 {% block content %}
 <div class="p-10 lg:p-20 text-center">
-    <h1 class="text-3xl lg:text-6xl text-white">{{username}}</h1>
+    <h1 class="text-3xl lg:text-6xl text-white">{{request.user.username}}</h1>
 </div>
 
 <div class="lg:w-2/4 mx-4 lg:mx-auto p-4 bg-white rounded-xl">
     <div class="chat-messages space-y-3" id="chat-messages">
-        {% comment %} {% for message in messages %}
-            <div class="p-4 bg-gray-200 rounded-xl">
-                <p class="font-semibold"> {{message.user.username}} </p>
-                <p> {{message.content}} </p>
-            </div>
-        {% endfor %} {% endcomment %}
+        {% comment %} Messages will be inserted here {% endcomment %}
     </div>
 </div>
 
@@ -50,10 +45,9 @@
         sent_to_user = 1
     }
     
-    const chatSocket = new WebSocket(`ws://${window.location.host}/uws/${roomName}/`);
+    const chatSocket = new WebSocket(`ws://${window.location.host}/uws/`);
 
     chatSocket.onmessage = function(e) {
-        console.log('onmessage')
         const data = JSON.parse(e.data)
         if (data.message){
             let html = '<div class="p-4 bg-gray-200 rounded-xl">';
@@ -69,7 +63,7 @@
     }
 
     chatSocket.onclose = function(e) {
-        console.log('onclose')
+        console.log('Socket closed')
     }
 
     document.querySelector('#chat-message-submit').onclick = function(e){

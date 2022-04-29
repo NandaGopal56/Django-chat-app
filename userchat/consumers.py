@@ -1,5 +1,3 @@
-from email import message
-import imp
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
@@ -9,16 +7,20 @@ from django.contrib.auth.models import User
 class UserChatConsumer(AsyncWebsocketConsumer):
     
     async def connect(self):
-        
-        authenticatedUser = self.scope["user"]
-        self.authenticated_user_chat_room = f'user_chat_{authenticatedUser}'
-        print('self.channel_name- ', self.channel_name, self.channel_layer)
-        await self.channel_layer.group_add(
-            self.authenticated_user_chat_room,
-            self.channel_name
-        )
 
-        await self.accept()
+        if self.scope["user"].is_anonymous:
+            self.authenticated_user_chat_room = f'user_chat_anonymous'
+            self.close()
+
+        else:
+            authenticatedUser = self.scope["user"].id
+            self.authenticated_user_chat_room = f'user_chat_{authenticatedUser}'
+            
+            await self.channel_layer.group_add(
+                self.authenticated_user_chat_room,
+                self.channel_name
+            )
+            await self.accept()
     
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
@@ -52,10 +54,10 @@ class UserChatConsumer(AsyncWebsocketConsumer):
                 'message': message,
                 'username': username,
                 'sent_by_user': sent_by_user,
-                'sent_to_user': sent_to_user
+                'sent_to_user': sent_to_user,
             }
         )
-
+        
         self.other_user_chat_room = f'user_chat_{sent_to_user}'
         await self.channel_layer.group_send(
             self.other_user_chat_room,
@@ -64,7 +66,7 @@ class UserChatConsumer(AsyncWebsocketConsumer):
                 'message': message,
                 'username': username,
                 'sent_by_user': sent_by_user,
-                'sent_to_user': sent_to_user
+                'sent_to_user': sent_to_user,
             }
         )
     
@@ -80,7 +82,7 @@ class UserChatConsumer(AsyncWebsocketConsumer):
             'message': message,
             'username': username,
             'sent_by_user': sent_by_user,
-            'sent_to_user': sent_to_user
+            'sent_to_user': sent_to_user,
         }))
     
     @database_sync_to_async
@@ -90,4 +92,4 @@ class UserChatConsumer(AsyncWebsocketConsumer):
             obj = qs.first()
         else:
             obj = None
-        return str(obj)
+        return str(obj.id)
